@@ -30,40 +30,78 @@ TutorialApplication::~TutorialApplication(void)
 void TutorialApplication::createScene(void)
 {
     // Ambient light
-    mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
     mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
     //Set camera
-    mCamera->setPosition(0, 47, 222);   //Pull camera up and back
+    mCamera->setPosition(-300, 300, 300);
+    mCamera->lookAt(0, 0, 0);
     // Light sources
     Ogre::Light * light = mSceneMgr->createLight("MainLight");
-    light->setPosition(20, 80, 50);
+    light->setPosition(20, 200, 50);
 
     //Plane
-    // Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
-    // Ogre::MeshManager::getSingleton().createPlane(
-    //     "ground",
-    //     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-    //     plane, 1500, 1500, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-    // Ogre::Entity* groundEntity = mSceneMgr->createEntity("ground");
-    // groundEntity->setCastShadows(false);
-    // groundEntity->setMaterialName("Examples/Rockwall"); //may break
-    // mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(groundEntity);
+    Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
+    Ogre::MeshManager::getSingleton().createPlane(
+        "ground",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        plane, 
+        400, 400, 20, 20, 
+        true, 
+        1, 5, 5, Ogre::Vector3::UNIT_Z);
+    //Bottom Plane
+    Ogre::Entity* groundEntity = mSceneMgr->createEntity("ground");
+    groundEntity->setCastShadows(false);
+    groundEntity->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * groundNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    groundNode->setPosition(0, -200, 0);
+    groundNode->attachObject(groundEntity);
+    //Top Plane
+    Ogre::Entity* ceilingEntity = mSceneMgr->createEntity("ground");
+    ceilingEntity->setCastShadows(false);
+    ceilingEntity->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * ceilingNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    ceilingNode->setPosition(0, 200, 0);
+    ceilingNode->roll(Ogre::Degree(180));
+    ceilingNode->attachObject(ceilingEntity);
+    //Walls
+    //Left wall
+    Ogre::Entity * wallEntity1 = mSceneMgr->createEntity("ground");
+    wallEntity1->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * wallNode1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    wallNode1->setPosition(-200, 0, 0);
+    wallNode1->roll(Ogre::Degree(-90));
+    wallNode1->yaw(Ogre::Degree(90));
+    wallNode1->attachObject(wallEntity1);
+    //Right wall
+    Ogre::Entity * wallEntity2 = mSceneMgr->createEntity("ground");
+    wallEntity2->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * wallNode2 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    wallNode2->setPosition(200, 0, 0);
+    wallNode2->roll(Ogre::Degree(90));
+    wallNode2->yaw(Ogre::Degree(-90));
+    wallNode2->attachObject(wallEntity2);
+    //Near wall
+    Ogre::Entity * wallEntity3 = mSceneMgr->createEntity("ground");
+    wallEntity3->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * wallNode3 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    wallNode3->setPosition(0, 0, 200);
+    wallNode3->pitch(Ogre::Degree(-90));
+    wallNode3->attachObject(wallEntity3);
+    //Far wall
+    Ogre::Entity * wallEntity4 = mSceneMgr->createEntity("ground");
+    wallEntity4->setMaterialName("Examples/Rockwall");
+    Ogre::SceneNode * wallNode4 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    wallNode4->setPosition(0, 0, -200);
+    wallNode4->pitch(Ogre::Degree(90));
+    wallNode4->attachObject(wallEntity4);
 
-    //Entity
-    // Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-    // ogreHead->setCastShadows(true);
-    // mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ogreHead);
+    //Ball
+    Ogre::Entity* ballEntity = mSceneMgr->createEntity("Ball", "sphere.mesh");
+    ballEntity->setCastShadows(true);
+    Ogre::SceneNode * ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    ballNode->setScale(0.3, 0.3, 0.3);
+    ballNode->attachObject(ballEntity);
 
-    Ogre::Entity* ogreHead2 = mSceneMgr->createEntity("Head2", "ogrehead.mesh");
-    Ogre::SceneNode* headNode2 = mSceneMgr->getRootSceneNode()->createChildSceneNode(
-        Ogre::Vector3(84, 48, 0));  //Setting position ourselves
-    headNode2->attachObject(ogreHead2);
-
-    //Normals? Texture? something not right
-    Ogre::Entity* ball = mSceneMgr->createEntity("Ball", "sphere.mesh");
-    ball->setCastShadows(true);
-    mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ball);
-    ball->setMaterialName("droplet.png");
 
 }
 

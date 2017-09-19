@@ -867,6 +867,8 @@ OgreApp-TutorialApplication.o: TutorialApplication.cpp \
  /usr/include/OGRE/OgreLodStrategyManager.h \
  /usr/include/OGRE/OgreLodStrategy.h /usr/include/OGRE/OgreWorkQueue.h \
  /usr/include/OGRE/OgreViewport.h /usr/include/OGRE/OgreSceneManager.h \
+ /usr/include/OGRE/OgreMeshManager.h /usr/include/OGRE/OgrePatchMesh.h \
+ /usr/include/OGRE/OgrePatchSurface.h \
  /usr/include/OGRE/OgreRenderWindow.h /usr/include/OGRE/OgreConfigFile.h \
  /usr/include/OGRE/OgreWindowEventUtilities.h \
  /usr/include/OGRE/OgreFrameListener.h \
@@ -2909,6 +2911,12 @@ BaseApplication.h:
 /usr/include/OGRE/OgreViewport.h:
 
 /usr/include/OGRE/OgreSceneManager.h:
+
+/usr/include/OGRE/OgreMeshManager.h:
+
+/usr/include/OGRE/OgrePatchMesh.h:
+
+/usr/include/OGRE/OgrePatchSurface.h:
 
 /usr/include/OGRE/OgreRenderWindow.h:
 
