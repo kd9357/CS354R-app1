@@ -98,11 +98,45 @@ void TutorialApplication::createScene(void)
     //Ball
     Ogre::Entity* ballEntity = mSceneMgr->createEntity("Ball", "sphere.mesh");
     ballEntity->setCastShadows(true);
-    Ogre::SceneNode * ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Ogre::SceneNode * ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("ballNode");
     ballNode->setScale(0.3, 0.3, 0.3);
     ballNode->attachObject(ballEntity);
 
 
+}
+
+//---------------------------------------------------------------------------
+bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& fe)
+{
+    bool ret = BaseApplication::frameRenderingQueued(fe);
+    if(!processUnbufferedInput(fe))
+        return false;
+
+    Ogre::Vector3 dirVec = Ogre::Vector3::ZERO;
+    dirVec.y -= 9.8;
+    mSceneMgr->getSceneNode("ballNode")->translate(
+        dirVec * fe.timeSinceLastFrame,
+        Ogre::Node::TS_LOCAL);
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& fe)
+{
+    static bool mouseDownLastFrame = false;
+    static Ogre::Real toggleTimer = 0.0f;
+    static Ogre::Real rotate = 0.13;
+    static Ogre::Real move = 250;
+
+    bool leftMouseDown = mMouse->getMouseState().buttonDown(OIS::MB_Left);
+    if(leftMouseDown && !mouseDownLastFrame)
+    {
+        Ogre::Light * light = mSceneMgr->getLight("MainLight");
+        light->setVisible(!light->isVisible());
+    }
+    mouseDownLastFrame = leftMouseDown;
+    return true;
 }
 
 //---------------------------------------------------------------------------

@@ -30,6 +30,10 @@ public:
 
 protected:
     virtual void createScene(void);
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& fe);
+
+private:
+    bool processUnbufferedInput(const Ogre::FrameEvent& fe);
 };
 
 //---------------------------------------------------------------------------
