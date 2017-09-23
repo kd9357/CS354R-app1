@@ -103,7 +103,11 @@ void TutorialApplication::createScene(void)
     ballNode->attachObject(ballEntity);
 
     radius = 30.6;  //Don't know where this number comes from
-    currentDir = Ogre::Vector3(0, -200, 0);
+
+    Ogre::Real x = Ogre::Math::RangeRandom(-500, 500);
+    Ogre::Real y = Ogre::Math::RangeRandom(-500, 0);
+    Ogre::Real z = Ogre::Math::RangeRandom(-500, 500);
+    currentDir = Ogre::Vector3(x, y, z);
 
 }
 
@@ -118,14 +122,44 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& fe)
     Ogre::Entity * ballEntity = static_cast<Ogre::Entity*>(ballNode->getAttachedObject(0));
     Ogre::AxisAlignedBox box = ballEntity->getWorldBoundingBox();
 
+    Ogre::Vector3 center = box.getCenter();
     Ogre::Vector3 newDir = currentDir;
+    Ogre::Vector3 normal = Ogre::Vector3::ZERO;
+
+    //There's probably a better way of doing this but oh well
     //hit floor
-    //TODO: Just determine which normal needs to be applied
-    if(box.getCenter().y - radius <= -200)
+    if(center.y - radius <= -200)
     {
-        newDir = currentDir - 2 * (currentDir.dotProduct(
-                 Ogre::Vector3(0, 1, 0)) * Ogre::Vector3(0, 1, 0));
+        normal += Ogre::Vector3(0, 1, 0);
     }
+    //hit ceiling
+    else if(center.y + radius >= 200)
+    {
+        normal += Ogre::Vector3(0, -1, 0);
+    }
+    //hit left wall
+    if(center.x - radius <= -200)
+    {
+        normal += Ogre::Vector3(1, 0, 0);
+    }
+    //hit right wall
+    else if(center.x + radius >= 200)
+    {
+        normal += Ogre::Vector3(-1, 0, 0);
+    }
+    //hit front wall
+    if(center.z - radius <= -200)
+    {
+        normal += Ogre::Vector3(0, 0, 1);
+    }
+    //hit back wall
+    else if(center.z + radius >= 200)
+    {
+        normal += Ogre::Vector3(0, 0, -1);
+    }
+    normal.normalise();
+
+    newDir = currentDir - 2 * (currentDir.dotProduct(normal) * normal);
     ballNode->translate(
         newDir * fe.timeSinceLastFrame,
         Ogre::Node::TS_LOCAL);
