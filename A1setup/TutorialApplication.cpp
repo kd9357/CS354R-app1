@@ -96,12 +96,14 @@ void TutorialApplication::createScene(void)
     wallNode4->attachObject(wallEntity4);
 
     //Ball
-    Ogre::Entity* ballEntity = mSceneMgr->createEntity("Ball", "sphere.mesh");
+    Ogre::Entity * ballEntity = mSceneMgr->createEntity("Ball", "sphere.mesh");
     ballEntity->setCastShadows(true);
-    Ogre::SceneNode * ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("ballNode");
+    ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("ballNode");
     ballNode->setScale(0.3, 0.3, 0.3);
     ballNode->attachObject(ballEntity);
 
+    radius = 30.6;  //Don't know where this number comes from
+    currentDir = Ogre::Vector3(0, -200, 0);
 
 }
 
@@ -112,11 +114,22 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& fe)
     if(!processUnbufferedInput(fe))
         return false;
 
-    Ogre::Vector3 dirVec = Ogre::Vector3::ZERO;
-    dirVec.y -= 9.8;
-    mSceneMgr->getSceneNode("ballNode")->translate(
-        dirVec * fe.timeSinceLastFrame,
+    //Setup collision
+    Ogre::Entity * ballEntity = static_cast<Ogre::Entity*>(ballNode->getAttachedObject(0));
+    Ogre::AxisAlignedBox box = ballEntity->getWorldBoundingBox();
+
+    Ogre::Vector3 newDir = currentDir;
+    //hit floor
+    //TODO: Just determine which normal needs to be applied
+    if(box.getCenter().y - radius <= -200)
+    {
+        newDir = currentDir - 2 * (currentDir.dotProduct(
+                 Ogre::Vector3(0, 1, 0)) * Ogre::Vector3(0, 1, 0));
+    }
+    ballNode->translate(
+        newDir * fe.timeSinceLastFrame,
         Ogre::Node::TS_LOCAL);
+    currentDir = newDir;
 
     return ret;
 }
