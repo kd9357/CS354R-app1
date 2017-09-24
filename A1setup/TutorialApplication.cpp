@@ -33,7 +33,7 @@ void TutorialApplication::createScene(void)
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
     mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
     //Set camera
-    mCamera->setPosition(-300, 300, 300);
+    mCamera->setPosition(0, 0, -300);
     mCamera->lookAt(0, 0, 0);
     // Light sources
     Ogre::Light * light = mSceneMgr->createLight("MainLight");
@@ -63,7 +63,6 @@ void TutorialApplication::createScene(void)
     ceilingNode->setPosition(0, 200, 0);
     ceilingNode->roll(Ogre::Degree(180));
     ceilingNode->attachObject(ceilingEntity);
-    //Walls
     //Left wall
     Ogre::Entity * wallEntity1 = mSceneMgr->createEntity("ground");
     wallEntity1->setMaterialName("Examples/Rockwall");
@@ -102,8 +101,6 @@ void TutorialApplication::createScene(void)
     ballNode->setScale(0.3, 0.3, 0.3);
     ballNode->attachObject(ballEntity);
 
-    radius = 30.6;  //Don't know where this number comes from
-
     Ogre::Real x = Ogre::Math::RangeRandom(-500, 500);
     Ogre::Real y = Ogre::Math::RangeRandom(-500, 0);
     Ogre::Real z = Ogre::Math::RangeRandom(-500, 500);
@@ -122,48 +119,55 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& fe)
     Ogre::Entity * ballEntity = static_cast<Ogre::Entity*>(ballNode->getAttachedObject(0));
     Ogre::AxisAlignedBox box = ballEntity->getWorldBoundingBox();
 
-    Ogre::Vector3 center = box.getCenter();
+    Ogre::Vector3 minimum = box.getMinimum();
+    Ogre::Vector3 maximum = box.getMaximum();
     Ogre::Vector3 newDir = currentDir;
     Ogre::Vector3 normal = Ogre::Vector3::ZERO;
 
     //There's probably a better way of doing this but oh well
     //hit floor
-    if(center.y - radius <= -200)
+    if(minimum.y <= -200)
     {
-        normal += Ogre::Vector3(0, 1, 0);
+        normal.y += 1;
     }
     //hit ceiling
-    else if(center.y + radius >= 200)
+    else if(maximum.y >= 200)
     {
-        normal += Ogre::Vector3(0, -1, 0);
+        normal.y -= 1;
     }
     //hit left wall
-    if(center.x - radius <= -200)
+    if(minimum.x <= -200)
     {
-        normal += Ogre::Vector3(1, 0, 0);
+        normal.x += 1;
     }
     //hit right wall
-    else if(center.x + radius >= 200)
+    else if(maximum.x >= 200)
     {
-        normal += Ogre::Vector3(-1, 0, 0);
+        normal.x -= 1;
     }
     //hit front wall
-    if(center.z - radius <= -200)
+    if(minimum.z <= -200)
     {
-        normal += Ogre::Vector3(0, 0, 1);
+        normal.z += 1;
     }
     //hit back wall
-    else if(center.z + radius >= 200)
+    else if(maximum.z >= 200)
     {
-        normal += Ogre::Vector3(0, 0, -1);
+        normal.z -= 1;
     }
     normal.normalise();
 
-    newDir = currentDir - 2 * (currentDir.dotProduct(normal) * normal);
+    //static int i = 0;
+    if(normal != Ogre::Vector3::ZERO)
+    {
+        //std::cout << i << ": collided with something\n";
+        newDir = currentDir - 2 * (currentDir.dotProduct(normal) * normal);
+        currentDir = newDir;
+        //++i;
+    }
     ballNode->translate(
-        newDir * fe.timeSinceLastFrame,
-        Ogre::Node::TS_LOCAL);
-    currentDir = newDir;
+            currentDir * fe.timeSinceLastFrame,
+            Ogre::Node::TS_LOCAL);
 
     return ret;
 }
@@ -173,9 +177,10 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& fe)
 {
     static bool mouseDownLastFrame = false;
     static Ogre::Real toggleTimer = 0.0f;
-    static Ogre::Real rotate = 0.13;
-    static Ogre::Real move = 250;
+    static Ogre::Real rotate = 0.01;
+    static Ogre::Real move = 0.1;
 
+    //Light controls
     bool leftMouseDown = mMouse->getMouseState().buttonDown(OIS::MB_Left);
     if(leftMouseDown && !mouseDownLastFrame)
     {
@@ -183,6 +188,32 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& fe)
         light->setVisible(!light->isVisible());
     }
     mouseDownLastFrame = leftMouseDown;
+
+    //Camera controls
+    Ogre::Vector3 dirVec = mCamera->getPosition();
+    if(mKeyboard->isKeyDown(OIS::KC_W))
+        dirVec.z += move;
+    if(mKeyboard->isKeyDown(OIS::KC_S))
+        dirVec.z -= move;
+    if(mKeyboard->isKeyDown(OIS::KC_Q))
+        dirVec.y += move;
+    if(mKeyboard->isKeyDown(OIS::KC_E))
+        dirVec.y -= move;
+    if(mKeyboard->isKeyDown(OIS::KC_A))
+    {
+        if(mKeyboard->isKeyDown(OIS::KC_LSHIFT))
+            mCamera->yaw(Ogre::Degree(rotate));
+        else
+            dirVec.x += move;
+    }
+    if(mKeyboard->isKeyDown(OIS::KC_D))
+    {
+        if(mKeyboard->isKeyDown(OIS::KC_LSHIFT))
+            mCamera->yaw(Ogre::Degree(-rotate));
+        else
+            dirVec.x -= move;
+    }
+    mCamera->setPosition(dirVec);
     return true;
 }
 

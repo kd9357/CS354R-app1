@@ -36,7 +36,6 @@ private:
     bool processUnbufferedInput(const Ogre::FrameEvent& fe);
 
     Ogre::SceneNode *  ballNode;
-    float radius, xMov, yMov, zMov;
     Ogre::Vector3 currentDir;
 };
 

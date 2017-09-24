@@ -1,0 +1,6 @@
+1. From the starter code, I included OgreMeshManager.h in BaseApplication.h to allow me to create planes, as per the tutorial provided by the Ogre documentation.
+2. I instantiated the ambient and sole directional light sources and camera position, created six hardcoded plane nodes size 400x400 using MeshManager, and a sphere node at (0, 0, 0).
+3. Every frame I fetch the entity from the ball node I've saved, and determine its axis aligned box. I instantiate a zero vector to act as a normal accumulator. For every plane the ball intersects with, I add the normal of the plane to the normal accumulator. Afterwards, I normalize the plane, thus allowing for the ball to be deflected when hitting a corner with three planes at once. I apply r = d - 2(d * n)n to determine the new reflected direction vector, and apply that vector onto the sphere node using local coordinate system.
+4. A rudimentary camera system and light switch is added, where W and S control the camera's world z, Q and E shift it's world y, and A and D move it's world x. Holding shift and pressing A or D rotates the camera. Clicking the left mouse button turns off the directional light source.
+
+Code comes mostly from Basic Tutorial 4 of the Ogre website: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Basic+Tutorial+4
